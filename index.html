@@ -692,7 +692,7 @@
     <script>
         // Configuration
         const TECH_GIST_URL = 'https://gist.githubusercontent.com/zixinlu12/371ce5a91ebabedc836d438ad9b045a4/raw/854765f068f6fd8d724f55fd58e33e2f7e84999b/tech_explanations_chinese_v4.json';
-        const FINANCE_GIST_URL = 'https://gist.githubusercontent.com/zixinlu12/3ad809fe8ff1e867fa7923a73cda5135/raw/7711e0747946e26dd5bdee6a5b1e1c8dd7c51f61/explanation_chinese'; // 添加金融词汇URL
+        const FINANCE_GIST_URL = 'https://gist.githubusercontent.com/zixinlu12/3ad809fe8ff1e867fa7923a73cda5135/raw/6dab723fbd280dcdebe3961a78d985ed77737d36/Finance_explanation_chinese'; // 添加金融词汇URL
         
         // State
         let concepts = [];
@@ -726,6 +726,7 @@
         async function init() {
             await loadConcepts();
             setupEventListeners();
+            // 初始化时就渲染过滤器
             renderFilters();
             renderQuickAccess();
             filterAndDisplay();
@@ -1111,17 +1112,26 @@
         
         // Setup event listeners
         function setupEventListeners() {
-            // Domain toggle
-            document.querySelectorAll('.domain-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentDomain = btn.dataset.domain;
-                    currentCategory = 'all'; // 重置分类
-                    renderFilters(); // 重新渲染分类过滤器
-                    filterAndDisplay();
+            // Domain toggle - 确保只绑定一次
+            const domainBtns = document.querySelectorAll('.domain-btn');
+            if (domainBtns.length > 0) {
+                domainBtns.forEach(btn => {
+                    // 先移除旧的事件监听器（如果有的话）
+                    btn.replaceWith(btn.cloneNode(true));
                 });
-            });
+                
+                // 重新获取按钮并添加事件监听器
+                document.querySelectorAll('.domain-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentDomain = btn.dataset.domain;
+                        currentCategory = 'all'; // 重置分类
+                        renderFilters(); // 重新渲染分类过滤器
+                        filterAndDisplay();
+                    });
+                });
+            }
             
             // Search input
             const searchInput = document.getElementById('searchInput');
